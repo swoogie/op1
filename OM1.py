@@ -3,9 +3,13 @@ import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
 
+count = 0
+
 
 def f(x):
-    return (x ** 2 - 4) ** 2 / 9 - 1
+    global count
+    count += 1
+    return (x ** 2 - 4) ** 2 / 9 - 1  # function
 
 
 def plot(l, r):
@@ -16,20 +20,27 @@ def plot(l, r):
     plt.plot(x, f(x), "k-")
 
 
+def plotPoint(x, f):
+    plt.plot(x, f, "c|", markersize=15)
+
+
 def bisection(l, r, e):
+    global count
+    count = 0
     L = r - l
     xm = (l + r) / 2
 
     plot(l, r)
 
+    it = 0
     while L >= e:
         x1 = l + L / 4
         x2 = r - L / 4
         fx1 = f(x1)
         fx2 = f(x2)
         fxm = f(xm)
-        plt.plot(x1, fx1, "c|")
-        plt.plot(x2, fx2, "c|")
+        plotPoint(x1, fx1)
+        plotPoint(x2, fx2)
 
         if fx1 < fxm:
             r = xm
@@ -44,28 +55,29 @@ def bisection(l, r, e):
             r = x2
 
         L = r - l
-
+        it += 1
 
     plt.plot(xm, f(xm), "rx")
     plt.show()
-    return xm
+    return xm, count, it
 
 
 def golden(l, r, e):
+    global count
+    count = 0
     L = r - l
     t = (-1 + math.sqrt(5)) / 2
     x1 = r - t * L
     x2 = l + t * L
 
     plot(l, r)
-
+    it = 0
     while L >= e:
-
         fx1 = f(x1)
         fx2 = f(x2)
 
-        plt.plot(x1, fx1, "c|")
-        plt.plot(x2, fx2, "c|")
+        plotPoint(x1, fx1)
+        plotPoint(x2, fx2)
         if fx2 < fx1:
             l = x1
             L = r - l
@@ -76,49 +88,61 @@ def golden(l, r, e):
             L = r - l
             x2 = x1
             x1 = r - t * L
+        it += 1
 
+    plt.plot(x1, f(x1), "rx")
     plt.show()
-    return x1
+    return x1, count, it
 
 
 def newton(x0, e):
+    global count
+    count = 0
     x = sym.Symbol('x')
 
-    df1 = sym.lambdify(x, sym.diff((x ** 2 - 4) ** 2 / 9 - 1, x))
-    df2 = sym.lambdify(x, sym.diff((x ** 2 - 4) ** 2 / 9 - 1, x, 2))
+    df1 = sym.lambdify(x, sym.diff(f(x), x))
+    df2 = sym.lambdify(x, sym.diff(f(x), x, 2))
 
     curr = x0 - df1(x0) / df2(x0)
     prev = x0
 
-    plot(0, 10)
-
+    plot(0, 10)  # 0, 10 is x axis
+    it = 0
     while abs(prev - curr) >= e:
-        plt.plot(prev, f(prev), "c|", markersize=15)
-        plt.plot(curr, f(curr), "c|", markersize=15)
+        plotPoint(prev, f(prev))
+        plotPoint(curr, f(curr))
+
         prev = curr
         curr = prev - df1(prev) / df2(prev)
+        it += 1
 
     plt.plot(curr, f(curr), "rx")
     plt.show()
 
-    return curr
+    return curr, count, it
 
 
 def main():
-    e = 0.00001
-    l = 0
-    r = 10
-    minimum = bisection(l, r, e)
-    print ("bisection results:\n",
-           "minimum value: ", minimum)
+    e = 0.00001  # accuracy
+    l = 0  # left
+    r = 10  # right
+    minimum, count, it = bisection(l, r, e)
+    print("bisection results:",
+          "\nminimum value: ", minimum,
+          "\nfunction was called: ", count, " times",
+          "\nnumber of iterations: ", it)
 
-    minimum = golden(l, r, e)
-    print ("golden ratio results:\n",
-           "minimum value: ", minimum)
+    minimum, count, it = golden(l, r, e)
+    print("golden ratio results:",
+          "\nminimum value: ", minimum,
+          "\nfunction was called: ", count, " times",
+          "\nnumber of iterations: ", it)
 
-    minimum = newton(5, e)
-    print("golden ratio results:\n",
-          "minimum value: ", minimum)
+    minimum, count, it = newton(5, e)  # 5 - starting point
+    print("golden ratio results:",
+          "\nminimum value: ", minimum,
+          "\nfunction was called: ", count, " times",
+          "\nnumber of iterations: ", it)
 
 
 if __name__ == "__main__":
