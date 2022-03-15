@@ -26,12 +26,12 @@ def plotPoint(x, f):
 
 def bisection(l, r, e):
     global count
-    count = 0
+
     L = r - l
     xm = (l + r) / 2
 
     plot(l, r)
-
+    count = 0
     it = 0
     while L >= e:
         x1 = l + L / 4
@@ -64,13 +64,14 @@ def bisection(l, r, e):
 
 def golden(l, r, e):
     global count
-    count = 0
+
     L = r - l
     t = (-1 + math.sqrt(5)) / 2
     x1 = r - t * L
     x2 = l + t * L
 
     plot(l, r)
+    count = 0
     it = 0
     while L >= e:
         fx1 = f(x1)
@@ -97,7 +98,7 @@ def golden(l, r, e):
 
 def newton(x0, e):
     global count
-    count = 0
+
     x = sym.Symbol('x')
 
     df1 = sym.lambdify(x, sym.diff(f(x), x))
@@ -107,6 +108,7 @@ def newton(x0, e):
     prev = x0
 
     plot(0, 10)  # 0, 10 is x axis
+    count = 0
     it = 0
     while abs(prev - curr) >= e:
         plotPoint(prev, f(prev))
@@ -139,7 +141,7 @@ def main():
           "\nnumber of iterations: ", it)
 
     minimum, count, it = newton(5, e)  # 5 - starting point
-    print("golden ratio results:",
+    print("newton results:",
           "\nminimum value: ", minimum,
           "\nfunction was called: ", count, " times",
           "\nnumber of iterations: ", it)
